@@ -1,6 +1,8 @@
 import { useState } from "react";
+import axios from "axios";
+import { createTodoService } from "../services/todo.services";
 
-function AddForm() {
+function AddForm(props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
@@ -9,9 +11,37 @@ function AddForm() {
   const handleDescriptionChange = (e) => setDescription(e.target.value);
   const handleIsUrgentChange = (e) => setIsUrgent(e.target.checked);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     // ... add the ToDo here
+    console.log("apretando el boton!!")
+
+    props.setIsLoading(true)
+
+    try {
+      
+      const newTodo = {
+        title,
+        description,
+        isUrgent
+      }
+
+      // const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/todo`, {
+      //   title,
+      //   description,
+      //   isUrgent
+      // })
+
+      await createTodoService(newTodo)
+
+      // ir de nuevo al Server y recibir los Todo actualizados
+      props.getData()
+
+    } catch (error) {
+      console.log(error)
+    }
+    
+
   }
 
   return (
@@ -27,6 +57,8 @@ function AddForm() {
           value={title}
         />
 
+        <br />
+
         <label htmlFor="description">Description</label>
         <input
           type="text"
@@ -35,6 +67,8 @@ function AddForm() {
           value={description}
         />
 
+        <br />
+
         <label htmlFor="isUrgent">Urgent</label>
         <input
           type="checkbox"
@@ -42,6 +76,8 @@ function AddForm() {
           onChange={handleIsUrgentChange}
           checked={isUrgent}
         />
+
+        <br />
 
         <button type="submit">Agregar</button>
       </form>
